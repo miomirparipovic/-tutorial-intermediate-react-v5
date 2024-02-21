@@ -1,3 +1,4 @@
+// mostly code from reactjs.org/docs/error-boundaries.html
 import { Component } from "react";
 import { Link } from "react-router-dom";
 
@@ -7,7 +8,6 @@ class ErrorBoundary extends Component {
     return { hasError: true };
   }
   componentDidCatch(error, info) {
-    // typically you'd log this to something like TrackJS or NewRelic
     console.error("ErrorBoundary caught an error", error, info);
   }
   render() {
