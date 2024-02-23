@@ -1,7 +1,7 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useSelector } from "react-redux";
 import Results from "./Results";
-import AdoptedPetContext from "./AdoptedPetContext";
 import useBreedList from "./useBreedList";
 import fetchSearch from "./fetchSearch";
 const ANIMALS = ["bird", "cat", "dog", "rabbit", "reptile"];
@@ -12,7 +12,10 @@ const SearchParams = () => {
     animal: "",
     breed: "",
   });
-  const [adoptedPet] = useContext(AdoptedPetContext);
+  const adoptedPet = useSelector((state) => state.adoptedPet.value);
+  // Triggers on every state change (not good)
+  // const store = useSelector((state) => state);
+  // const adoptedPet = store.adoptedPet;
   const [animal, setAnimal] = useState("");
   const [breeds] = useBreedList(animal);
 
