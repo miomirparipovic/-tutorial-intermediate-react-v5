@@ -1,39 +1,35 @@
-import { useContext, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useSearchQuery } from "./petApiService";
+import { useSelector, useDispatch } from "react-redux";
 import Results from "./Results";
-import AdoptedPetContext from "./AdoptedPetContext";
 import useBreedList from "./useBreedList";
-import fetchSearch from "./fetchSearch";
-import { Animal } from "./APIResponsesTypes";
-
-const ANIMALS: Animal[] = ["bird", "cat", "dog", "rabbit", "reptile"];
+import { all } from "./searchParamsSlice";
+const ANIMALS = ["bird", "cat", "dog", "rabbit", "reptile"];
 
 const SearchParams = () => {
-  const [requestParams, setRequestParams] = useState({
-    location: "",
-    animal: "" as Animal,
-    breed: "",
-  });
-  const [adoptedPet] = useContext(AdoptedPetContext);
-  const [animal, setAnimal] = useState("" as Animal);
+  const dispatch = useDispatch();
+  const adoptedPet = useSelector((state) => state.adoptedPet.value);
+  // Triggers on every state change (not good)
+  // const store = useSelector((state) => state);
+  // const adoptedPet = store.adoptedPet;
+  const searchParams = useSelector((state) => state.searchParams.value);
+  const [animal, setAnimal] = useState("");
   const [breeds] = useBreedList(animal);
-
-  const results = useQuery(["search", requestParams], fetchSearch);
-  const pets = results?.data?.pets ?? [];
+  let { data: pets } = useSearchQuery(searchParams);
+  pets = pets ?? [];
 
   return (
     <div className="search-params">
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          const formData = new FormData(e.currentTarget);
+          const formData = new FormData(e.target);
           const obj = {
-            animal:
-              (formData.get("animal")?.toString() as Animal) ?? ("" as Animal),
-            breed: formData.get("breed")?.toString() ?? "",
-            location: formData.get("location")?.toString() ?? "",
+            animal: formData.get("animal") ?? "",
+            breed: formData.get("breed") ?? "",
+            location: formData.get("location") ?? "",
           };
-          setRequestParams(obj);
+          dispatch(all(obj));
         }}
       >
         {adoptedPet ? (
@@ -52,10 +48,10 @@ const SearchParams = () => {
             id="animal"
             name="animal"
             onChange={(e) => {
-              setAnimal(e.target.value as Animal);
+              setAnimal(e.target.value);
             }}
             onBlur={(e) => {
-              setAnimal(e.target.value as Animal);
+              setAnimal(e.target.value);
             }}
           >
             <option />
